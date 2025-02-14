@@ -18,7 +18,7 @@ Add this to your package's `pubspec.yaml` file:
 
 ```yaml
 dependencies:
-  sms_sender_background: ^1.0.3
+  sms_sender_background: ^1.0.5
 ```
 
 ### Android Setup

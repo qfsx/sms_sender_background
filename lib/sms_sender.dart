@@ -1,9 +1,11 @@
-// You have generated a new plugin project without specifying the `--platforms`
-// flag. A plugin project with no platform support was generated. To add a
-// platform, run `flutter create -t plugin --platforms <platforms> .` under the
-// same directory. You can also find a detailed instruction on how to add
-// platforms in the `pubspec.yaml` at
-// https://flutter.dev/to/pubsec-plugin-platforms.
+/// A Flutter plugin for sending SMS messages with support for dual SIM cards.
+///
+/// This plugin provides functionality to:
+/// * Send SMS messages
+/// * Check and request SMS permissions
+/// * Support for dual SIM cards
+/// * Handle long messages automatically
+library sms_sender;
 
 import 'dart:async';
 import 'package:flutter/services.dart';
@@ -36,12 +38,8 @@ class SmsSender {
         'simSlot': simSlot,
       });
       return result ?? false;
-    } on PlatformException catch (e) {
-      throw PlatformException(
-        code: e.code,
-        message: 'Failed to send SMS: ${e.message}',
-        details: e.details,
-      );
+    } on PlatformException {
+      return false;
     }
   }
 
@@ -53,12 +51,8 @@ class SmsSender {
     try {
       final bool? result = await _channel.invokeMethod('checkSmsPermission');
       return result ?? false;
-    } on PlatformException catch (e) {
-      throw PlatformException(
-        code: e.code,
-        message: 'Failed to check SMS permission: ${e.message}',
-        details: e.details,
-      );
+    } on PlatformException {
+      return false;
     }
   }
 
@@ -70,12 +64,8 @@ class SmsSender {
     try {
       final bool? result = await _channel.invokeMethod('requestSmsPermission');
       return result ?? false;
-    } on PlatformException catch (e) {
-      throw PlatformException(
-        code: e.code,
-        message: 'Failed to request SMS permission: ${e.message}',
-        details: e.details,
-      );
+    } on PlatformException {
+      return false;
     }
   }
 }
