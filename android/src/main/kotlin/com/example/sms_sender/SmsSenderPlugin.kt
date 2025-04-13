@@ -1,6 +1,17 @@
 package com.example.sms_sender
 
+import android.Manifest
+import android.app.Activity
+import android.content.Context
+import android.content.pm.PackageManager
+import android.os.Build
+import android.telephony.SmsManager
+import android.telephony.SubscriptionInfo
+import android.telephony.SubscriptionManager
+import android.util.Log
 import androidx.annotation.NonNull
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.embedding.engine.plugins.activity.ActivityAware
 import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding
@@ -8,15 +19,6 @@ import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 import io.flutter.plugin.common.MethodChannel.Result
-import android.Manifest
-import android.app.Activity
-import android.content.pm.PackageManager
-import android.os.Build
-import android.telephony.SmsManager
-import android.util.Log
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
-import android.content.Context
 
 /** SmsSenderPlugin */
 class SmsSenderPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
@@ -93,7 +95,11 @@ class SmsSenderPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
         activity?.let {
             ActivityCompat.requestPermissions(
                 it,
-                arrayOf(Manifest.permission.SEND_SMS),
+                arrayOf(
+                    Manifest.permission.READ_PHONE_STATE,
+                    Manifest.permission.READ_PHONE_NUMBERS,
+                    Manifest.permission.SEND_SMS
+                ),
                 SMS_PERMISSION_REQUEST_CODE
             )
         }
@@ -102,9 +108,17 @@ class SmsSenderPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
     private fun sendSms(phoneNumber: String, message: String, simSlot: Int): Boolean {
         try {
             Log.d("SmsSender", "Sending SMS to $phoneNumber using SIM slot $simSlot")
-            
+
             val smsManager = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
-                SmsManager.getSmsManagerForSubscriptionId(simSlot)
+                if (!hasPermissions()) {
+                    requestSimPermissions()
+                }
+                val subscriptionManager: SubscriptionManager =
+                    context.getSystemService(Context.TELEPHONY_SUBSCRIPTION_SERVICE) as SubscriptionManager
+                val subscriptionInfoList: List<SubscriptionInfo> =
+                    subscriptionManager.getActiveSubscriptionInfoList()
+                val subId: Int = subscriptionInfoList.get(simSlot).getSubscriptionId()
+                SmsManager.getSmsManagerForSubscriptionId(subId)
             } else {
                 SmsManager.getDefault()
             }
@@ -119,6 +133,25 @@ class SmsSenderPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
         } catch (e: Exception) {
             Log.e("SmsSender", "Error sending SMS: ${e.message}", e)
             throw e
+        }
+    }
+
+
+    private fun hasPermissions(): Boolean {
+        return ContextCompat.checkSelfPermission(context, Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED &&
+                ContextCompat.checkSelfPermission(context, Manifest.permission.READ_PHONE_NUMBERS) == PackageManager.PERMISSION_GRANTED
+    }
+
+    private fun requestSimPermissions() {
+        activity?.let {
+            ActivityCompat.requestPermissions(
+                it,
+                arrayOf(
+                    Manifest.permission.READ_PHONE_STATE,
+                    Manifest.permission.READ_PHONE_NUMBERS
+                ),
+                SMS_PERMISSION_REQUEST_CODE
+            )
         }
     }
 

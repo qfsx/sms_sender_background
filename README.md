@@ -18,7 +18,9 @@ Add this to your package's `pubspec.yaml` file:
 
 ```yaml
 dependencies:
-  sms_sender_background: ^1.0.5
+  sms_sender_background:
+    git:
+      url: https://github.com/qfsx/sms_sender_background.git
 ```
 
 ### Android Setup
@@ -32,7 +34,7 @@ Add the following permission to your Android Manifest (`android/app/src/main/And
 ### Usage
 
 ```dart
-import 'package:sms_sender_background/sms_sender.dart';;
+import 'package:sms_sender_background/sms_sender.dart';
 
 // Create an instance
 final smsSender = SmsSender();
