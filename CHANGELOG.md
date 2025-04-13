@@ -1,4 +1,4 @@
-## 1.0.5
+## 1.0.6
 
 Initial release with the following features:
 * Send SMS messages with support for dual SIM cards
