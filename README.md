@@ -29,6 +29,8 @@ Add the following permission to your Android Manifest (`android/app/src/main/And
 
 ```xml
 <uses-permission android:name="android.permission.SEND_SMS"/>
+<uses-permission android:name="android.permission.READ_PHONE_STATE" />
+<uses-permission android:name="android.permission.READ_PHONE_NUMBERS" />
 ```
 
 ### Usage
