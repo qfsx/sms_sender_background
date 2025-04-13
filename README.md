@@ -34,7 +34,7 @@ Add the following permission to your Android Manifest (`android/app/src/main/And
 ### Usage
 
 ```dart
-import 'package:sms_sender_background/sms_sender.dart';
+import 'package:sms_sender_background/sms_sender.dart';;
 
 // Create an instance
 final smsSender = SmsSender();
